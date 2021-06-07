@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>crm</display-name>
+<!--    关于编码方式的过滤器-->
+    <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>com.tonpower.crm.web.filter.EncodingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
+<!--    关于防止恶意登录的过滤器-->
+    <filter>
+        <filter-name>LoginFilter</filter-name>
+        <filter-class>com.tonpower.crm.web.filter.LoginFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>LoginFilter</filter-name>
+        <url-pattern>*.do</url-pattern>
+        <url-pattern>*.jsp</url-pattern>
+        <url-pattern>*.html</url-pattern>
+    </filter-mapping>
+<!--    用户控制器  -->
+    <servlet>
+        <servlet-name>UserController</servlet-name>
+        <servlet-class>com.tonpower.crm.settings.web.controller.UserController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserController</servlet-name>
+        <url-pattern>/settings/user/login.do</url-pattern>
+    </servlet-mapping>
+<!--    市场活动控制器-->
+    <servlet>
+        <servlet-name>ActivityController</servlet-name>
+        <servlet-class>com.tonpower.crm.workbench.web.controller.ActivityController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ActivityController</servlet-name>
+        <url-pattern>/workbench/activity/getUserList.do</url-pattern>
+        <url-pattern>/workbench/activity/save.do</url-pattern>
+        <url-pattern>/workbench/activity/pageList.do</url-pattern>
+        <url-pattern>/workbench/activity/detele.do</url-pattern>
+        <url-pattern>/workbench/activity/getUserListAndActivity.do</url-pattern>
+        <url-pattern>/workbench/activity/update.do</url-pattern>
+        <url-pattern>/workbench/activity/detail.do</url-pattern>
+        <url-pattern>/workbench/activity/getRemarkListByAid.do</url-pattern>
+        <url-pattern>/workbench/activity/deleteRemark.do</url-pattern>
+        <url-pattern>/workbench/activity/saveRemark.do</url-pattern>
+        <url-pattern>/workbench/activity/updateRemark.do</url-pattern>
+    </servlet-mapping>
+
+<!--    欢迎页面-->
+    <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
