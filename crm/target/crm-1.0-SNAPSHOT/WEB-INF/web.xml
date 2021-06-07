@@ -49,7 +49,15 @@
         <url-pattern>/workbench/activity/saveRemark.do</url-pattern>
         <url-pattern>/workbench/activity/updateRemark.do</url-pattern>
     </servlet-mapping>
-
+<!--  线索控制器  -->
+    <servlet>
+        <servlet-name>ClueController</servlet-name>
+        <servlet-class>com.tonpower.crm.workbench.web.controller.ClueController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ClueController</servlet-name>
+        <url-pattern>/workbench/clue/xxx.do</url-pattern>
+    </servlet-mapping>
 <!--    欢迎页面-->
     <welcome-file-list>
     <welcome-file>index.html</welcome-file>
