@@ -5,4 +5,9 @@
 
 <mapper namespace="com.tonpower.crm.settings.dao.DicValueDao">
 
+    <select id="getListByCode" resultType="DicValue">
+
+        select * from tbl_dic_value where typeCode=#{code}
+
+    </select>
 </mapper>

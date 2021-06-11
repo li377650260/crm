@@ -5,5 +5,9 @@
 
 <mapper namespace="com.tonpower.crm.settings.dao.DicTypeDao">
 
+    <select id="getTypeList" resultType="DicType">
 
+    select * from tbl_dic_type
+
+    </select>
 </mapper>

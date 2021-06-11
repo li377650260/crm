@@ -10,6 +10,10 @@
         <filter-name>EncodingFilter</filter-name>
         <url-pattern>*.do</url-pattern>
     </filter-mapping>
+<!--    关于数据字典的监听器-->
+    <listener>
+        <listener-class>com.tonpower.crm.web.listener.SysInitListener</listener-class>
+    </listener>
 <!--    关于防止恶意登录的过滤器-->
     <filter>
         <filter-name>LoginFilter</filter-name>
@@ -56,7 +60,10 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ClueController</servlet-name>
-        <url-pattern>/workbench/clue/xxx.do</url-pattern>
+        <url-pattern>/workbench/clue/getUserList.do</url-pattern>
+        <url-pattern>/workbench/clue/save.do</url-pattern>
+        <url-pattern>/workbench/clue/detail.do</url-pattern>
+        <url-pattern>/workbench/clue/getActivityListByClueId.do</url-pattern>
     </servlet-mapping>
 <!--    欢迎页面-->
     <welcome-file-list>

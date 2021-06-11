@@ -155,4 +155,12 @@ public class ActivityServiceImpl implements ActivityService {
         return flag;
     }
 
+    @Override
+    public List<Activity> getActivityListByClueId(String clueId) {
+        dao = SqlSessionUtil.getSqlSession().getMapper(ActivityDao.class);
+        List<Activity> list = dao.getActivityListByClueId(clueId);
+
+        return list;
+    }
+
 }
