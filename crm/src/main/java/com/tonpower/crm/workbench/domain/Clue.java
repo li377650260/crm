@@ -22,7 +22,33 @@ public class Clue {
 	private String contactSummary;	//联系纪要
 	private String nextContactTime;	//下次联系时间
 	private String address;	//地址
-	
+
+	@Override
+	public String toString() {
+		return "Clue{" +
+				"id='" + id + '\'' +
+				", fullname='" + fullname + '\'' +
+				", appellation='" + appellation + '\'' +
+				", owner='" + owner + '\'' +
+				", company='" + company + '\'' +
+				", job='" + job + '\'' +
+				", email='" + email + '\'' +
+				", phone='" + phone + '\'' +
+				", website='" + website + '\'' +
+				", mphone='" + mphone + '\'' +
+				", state='" + state + '\'' +
+				", source='" + source + '\'' +
+				", createBy='" + createBy + '\'' +
+				", createTime='" + createTime + '\'' +
+				", editBy='" + editBy + '\'' +
+				", editTime='" + editTime + '\'' +
+				", description='" + description + '\'' +
+				", contactSummary='" + contactSummary + '\'' +
+				", nextContactTime='" + nextContactTime + '\'' +
+				", address='" + address + '\'' +
+				'}';
+	}
+
 	public String getId() {
 		return id;
 	}

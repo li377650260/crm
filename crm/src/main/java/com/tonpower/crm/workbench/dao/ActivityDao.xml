@@ -5,6 +5,38 @@
 
 <mapper namespace="com.tonpower.crm.workbench.dao.ActivityDao">
 
+    <select id="getActivityListByName" resultType="Activity">
+
+        select
+        a.id,
+        a.name,
+        u.name as owner,
+        a.startDate,
+        a.endDate
+        from tbl_activity a
+        join tbl_user u
+        on u.id=a.owner
+         where a.name like '%' #{aname} '%'
+    </select>
+
+    <select id="getActivityByNameAndNotByClueId" resultType="Activity">
+
+        select
+        a.id,
+        a.name,
+        u.name as owner,
+        a.startDate,
+        a.endDate
+        from tbl_activity a
+        join tbl_user u
+        on u.id=a.owner
+        where a.name like '%' #{aname} '%' and a.id not in (
+        select activityId
+        from tbl_clue_activity_relation
+        where clueId=#{clueId}
+        )
+    </select>
+
     <select id="getActivityListByClueId" resultType="Activity">
 
         select

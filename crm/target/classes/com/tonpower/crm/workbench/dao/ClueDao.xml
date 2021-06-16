@@ -4,7 +4,130 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.tonpower.crm.workbench.dao.ClueDao">
-	
+
+    <select id="getDataListByCondition" parameterType="map" resultType="Clue">
+        select
+
+        a.id,
+        a.fullname,
+        u.name as owner,
+        a.company,
+        a.phone,
+        a.mphone,
+        a.source,
+        a.state
+
+        from tbl_clue a
+        join tbl_user u
+        on a.owner=u.id
+
+        <where>
+
+            <if test="name!=null and name!=''">
+
+                a.fullname like '%' #{name} '%'
+
+            </if>
+
+            <if test="owner!=null and owner!=''">
+
+                and u.name like '%' #{owner} '%'
+
+            </if>
+
+            <if test="company!=null and company!=''">
+
+                and a.company like '%' #{company} '%'
+
+            </if>
+
+            <if test="phone!=null and phone!=''">
+
+                and a.phone like '%' #{phone} '%'
+
+            </if>
+
+            <if test="mphone!=null and mphone!=''">
+
+                and a.mphone like '%' #{mphone} '%'
+
+            </if>
+
+            <if test="source!=null and source!=''">
+
+                and a.source like '%' #{source} '%'
+
+            </if>
+
+            <if test="clueState!=null and clueState!=''">
+
+                and a.state like '%' #{clueState} '%'
+
+            </if>
+
+        </where>
+
+        order by a.createTime desc
+
+        limit ${skipCount},${pageSize}
+
+    </select>
+    <select id="getTotalByCondition" resultType="int">
+        select count(*)
+        from tbl_clue a join tbl_user u on a.owner = u.id
+        <where>
+            <if test="name!=null and name!=''">
+
+                a.fullname like '%' #{name} '%'
+
+            </if>
+
+            <if test="owner!=null and owner!=''">
+
+                and u.name like '%' #{owner} '%'
+
+            </if>
+
+            <if test="company!=null and company!=''">
+
+                and a.company like '%' #{company} '%'
+
+            </if>
+
+            <if test="phone!=null and phone!=''">
+
+                and a.phone like '%' #{phone} '%'
+
+            </if>
+
+            <if test="mphone!=null and mphone!=''">
+
+                and a.mphone like '%' #{mphone} '%'
+
+            </if>
+
+            <if test="source!=null and source!=''">
+
+                and a.source like '%' #{source} '%'
+
+            </if>
+
+            <if test="clueState!=null and clueState!=''">
+
+                and a.state like '%' #{clueState} '%'
+
+            </if>
+
+        </where>
+    </select>
+
+    <delete id="detele" >
+        delete from tbl_clue where id=#{id}
+    </delete>
+    <select id="getById"  resultType="Clue">
+        select * from tbl_clue where id=#{id}
+    </select>
+
 	<insert id="save" parameterType="Clue">
 
         insert into tbl_clue (

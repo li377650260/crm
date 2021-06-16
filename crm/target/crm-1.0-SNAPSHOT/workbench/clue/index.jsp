@@ -17,7 +17,9 @@
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
-
+<link rel="stylesheet" type="text/css" href="jquery/bs_pagination/jquery.bs_pagination.min.css">
+<script type="text/javascript" src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination/en.js"></script>
 <script type="text/javascript">
 
 	$(function(){
@@ -80,20 +82,142 @@
 				success:function (data) {
 					if (data.success){
 						//刷新列表
-
+						pageList(1
+								,$("#activityPage").bs_pagination('getOption', 'rowsPerPage'));
 						// 关闭模态窗口
 						$("#createClueModal").modal("hide");
+
 					}else {
 						alert("添加线索失败")
 					}
 				},
 			})
-		})
+		});
+
+		pageList(1,2);
+
+		$("#searchBtn").click(function () {
+
+			// 在点击搜索之前将搜索框中的信息保存起来
+			// $("#hidden-name").val($.trim($("#search-name").val()));
+			// $("#hidden-owner").val($.trim($("#search-owner").val()));
+			// $("#hidden-startDate").val($.trim($("#search-startDate").val()))
+			// $("#hidden-endDate").val($.trim($("#search-endDate").val()));
+			// $("#hidden-company").val($.trim($("#search-endDate").val()));
+			// $("#hidden-phone").val($.trim($("#search-endDate").val()));
+			// $("#hidden-source").val($.trim($("#search-endDate").val()));
+
+			pageList(1,2);
+		});
+		// 为全选的复选框绑定事件，触发全选操作
+		$("#qx").click(function () {
+			$("input[name=xz ]").prop("checked",this.checked);
+		});
+
+		/*
+		为每个复选框添加事件，如果每个复选框都被选择则自动勾选全选复选框
+		动态拼接生成的元素不能够通过普通的方法来进行绑定事件
+		需要使用jQuery on方法的形式来绑定事件
+		语法：$(需要绑定元素的有效外层元素).on(绑定事件的方式，需要绑定事件的元素的jQuery对象，回调函数)
+		 */
+		$("#activityBody").on("click",$("input[name=xz]"),function () {
+			$("#qx").prop("checked",$("input[name=xz]").length == $("input[name=xz]:checked").length)
+		});
 	});
-	
+	/*
+在页面加载完成之后的加载的方法来进行局部刷新展现列表信息
+对于所有关系型数据库来坐分页的操作，都需要pageNo和pageSize
+pageNo：页码   pageSize：每页展现的记录数
+调用pageList的情况：
+（1）点击左侧的市场活动超链接时；
+（2）添加，修改，删除后，需要刷新列表
+（3）点击查询按钮的时候
+（4）点击分页组件的时候
+ */
+	function pageList(pageNo,pageSize){
+		// 进行列表刷新时，将全选的复选框设为未选择
+		$("#qx").prop("checked",false);
+
+		// 在查询前将隐藏域中的信息取出来，重新赋予到搜索框中
+		// $("#search-name").val($.trim($("#hidden-name").val()));
+		// $("#search-owner").val($.trim($("#hidden-owner").val()));
+		// $("#search-startDate").val($.trim($("#hidden-startDate").val()));
+		// $("#search-endDate").val($.trim($("#hidden-endDate").val()));
+		// $("#search-company").val($.trim($("#hidden-endDate").val()));
+		// $("#search-phone").val($.trim($("#hidden-endDate").val()));
+		// $("#search-source").val($.trim($("#hidden-endDate").val()));
+		$.ajax({
+			url:"workbench/clue/pageList.do",
+			data: {
+				"pageNo":pageNo,
+				"pageSize":pageSize,
+				"name":$.trim($("#search-name").val()),
+				"company":$.trim($("#search-company").val()),
+				"phone":$.trim($("#search-phone").val()),
+				"source":$.trim($("#search-source").val()),
+				"owner":$.trim($("#search-owner").val()),
+				"mphone":$.trim($("#search-mphone").val()),
+				"clueState":$.trim($("#search-clueState").val())
+			},
+			type:"get",
+			dataType:"json",
+			success:function (data) {
+				/*
+				data:[{市场活动信息1},{市场活动信息2}]
+				查询的总条数：total
+				data:[{"total":100},{"dataList":[{市场活动信息1},{市场活动信息2}]}]
+				 */
+
+				var html = "";
+				$.each(data.dataList,function (i,n) {
+					html += '<tr class="active"> ';
+					html += '<td><input type="checkbox" name="xz" id="'+n.id+'"/></td> ';
+					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/clue/detail.do?id='+n.id+'\';">'+n.fullname+'</a></td>';
+					html += '<td>'+n.company+'</td>';
+					html += '<td>'+n.phone+'</td>';
+					html += '<td>'+n.mphone+'</td>';
+					html += '<td>'+n.source+'</td>';
+					html += '<td>'+n.owner+'</td>';
+					html += '<td>'+n.state+'</td>';
+					html += '</tr>';
+				});
+				$("#clueBody").html(html);
+
+				// 计算总页数
+				var totalPages = (data.total % pageSize) == 0 ? data.total / pageSize : parseInt(data.total / pageSize) + 1;
+
+				// 数据处理完毕后，结合分页查询，对前端页面进行展示
+				$("#cluePage").bs_pagination({
+					currentPage: pageNo, // 页码
+					rowsPerPage: pageSize, // 每页显示的记录条数
+					maxRowsPerPage: 20, // 每页最多显示的记录条数
+					totalPages: totalPages, // 总页数
+					totalRows: data.total, // 总记录条数
+
+					visiblePageLinks: 3, // 显示几个卡片
+
+					showGoToPage: true,
+					showRowsPerPage: true,
+					showRowsInfo: true,
+					showRowsDefaultInfo: true,
+
+					onChangePage : function(event, data){
+						pageList(data.currentPage , data.rowsPerPage);
+					}
+				});
+			}
+		})
+	}
 </script>
 </head>
 <body>
+	<input type="hidden" id="hidden-name">
+	<input type="hidden" id="hidden-company">
+	<input type="hidden" id="hidden-phone">
+	<input type="hidden" id="hidden-source">
+	<input type="hidden" id="hidden-owner">
+	<input type="hidden" id="hidden-mphone">
+	<input type="hidden" id="hidden-clueState">
 
 	<!-- 创建线索的模态窗口 -->
 	<div class="modal fade" id="createClueModal" role="dialog">
@@ -262,11 +386,9 @@
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-call">
 								  <option></option>
-								  <option selected>先生</option>
-								  <option>夫人</option>
-								  <option>女士</option>
-								  <option>博士</option>
-								  <option>教授</option>
+									<c:forEach items="${source}" var="s" >
+										<option value="${s.value}">${s.text}</option>
+									</c:forEach>
 								</select>
 							</div>
 							<label for="edit-surname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
@@ -305,14 +427,9 @@
 							<label for="edit-status" class="col-sm-2 control-label">线索状态</label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-status">
-								  <option></option>
-								  <option>试图联系</option>
-								  <option>将来联系</option>
-								  <option selected>已联系</option>
-								  <option>虚假线索</option>
-								  <option>丢失线索</option>
-								  <option>未联系</option>
-								  <option>需要条件</option>
+									<c:forEach items="${clueState}" var="c" >
+										<option value="${c.value}">${c.text}</option>
+									</c:forEach>
 								</select>
 							</div>
 						</div>
@@ -322,20 +439,9 @@
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-source">
 								  <option></option>
-								  <option selected>广告</option>
-								  <option>推销电话</option>
-								  <option>员工介绍</option>
-								  <option>外部介绍</option>
-								  <option>在线商场</option>
-								  <option>合作伙伴</option>
-								  <option>公开媒介</option>
-								  <option>销售邮件</option>
-								  <option>合作伙伴研讨会</option>
-								  <option>内部研讨会</option>
-								  <option>交易会</option>
-								  <option>web下载</option>
-								  <option>web调研</option>
-								  <option>聊天</option>
+									<c:forEach items="${source}" var="s" >
+										<option value="${s.value}">${s.text}</option>
+									</c:forEach>
 								</select>
 							</div>
 						</div>
@@ -406,43 +512,32 @@
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">名称</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" id="search-name" type="text">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">公司</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" id="search-company" type="text">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">公司座机</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" id="search-phone" type="text">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">线索来源</div>
-					  <select class="form-control">
+					  <select class="form-control" id="search-source">
 					  	  <option></option>
-					  	  <option>广告</option>
-						  <option>推销电话</option>
-						  <option>员工介绍</option>
-						  <option>外部介绍</option>
-						  <option>在线商场</option>
-						  <option>合作伙伴</option>
-						  <option>公开媒介</option>
-						  <option>销售邮件</option>
-						  <option>合作伙伴研讨会</option>
-						  <option>内部研讨会</option>
-						  <option>交易会</option>
-						  <option>web下载</option>
-						  <option>web调研</option>
-						  <option>聊天</option>
+						  <c:forEach items="${source}" var="s" >
+							  <option value="${s.value}">${s.text}</option>
+						  </c:forEach>
 					  </select>
 				    </div>
 				  </div>
@@ -452,7 +547,7 @@
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">所有者</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" id="search-owner" type="text">
 				    </div>
 				  </div>
 				  
@@ -461,27 +556,23 @@
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">手机</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" id="search-mphone" type="text">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">线索状态</div>
-					  <select class="form-control">
+					  <select class="form-control" id="search-clueState">
 					  	<option></option>
-					  	<option>试图联系</option>
-					  	<option>将来联系</option>
-					  	<option>已联系</option>
-					  	<option>虚假线索</option>
-					  	<option>丢失线索</option>
-					  	<option>未联系</option>
-					  	<option>需要条件</option>
+						  <c:forEach items="${clueState}" var="c" >
+							  <option value="${c.value}">${c.text}</option>
+						  </c:forEach>
 					  </select>
 				    </div>
 				  </div>
 
-				  <button type="submit" class="btn btn-default">查询</button>
+				  <button type="button" class="btn btn-default" id="searchBtn">查询</button>
 				  
 				</form>
 			</div>
@@ -498,7 +589,7 @@
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox" id="qx" /></td>
 							<td>名称</td>
 							<td>公司</td>
 							<td>公司座机</td>
@@ -508,17 +599,17 @@
 							<td>线索状态</td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td><input type="checkbox" /></td>
-							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/clue/detail.do?id=13993b3d87114056828bec110509deae';">马云先生</a></td>
-							<td>动力节点</td>
-							<td>010-84846003</td>
-							<td>12345678901</td>
-							<td>广告</td>
-							<td>zhangsan</td>
-							<td>已联系</td>
-						</tr>
+					<tbody id="clueBody">
+<%--						<tr>--%>
+<%--							<td><input type="checkbox" /></td>--%>
+<%--							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/clue/detail.do?id=13993b3d87114056828bec110509deae';">马云先生</a></td>--%>
+<%--							<td>动力节点</td>--%>
+<%--							<td>010-84846003</td>--%>
+<%--							<td>12345678901</td>--%>
+<%--							<td>广告</td>--%>
+<%--							<td>zhangsan</td>--%>
+<%--							<td>已联系</td>--%>
+<%--						</tr>--%>
                         <tr class="active">
                             <td><input type="checkbox" /></td>
                             <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/clue/detail.do?id=65d8d118fdf44b11bc00d54b9869ca90';">王健林先生</a></td>
@@ -533,39 +624,8 @@
 				</table>
 			</div>
 			
-			<div style="height: 50px; position: relative;top: 60px;">
-				<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
-				</div>
-				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							10
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">20</a></li>
-							<li><a href="#">30</a></li>
-						</ul>
-					</div>
-					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-				</div>
-				<div style="position: relative;top: -88px; left: 285px;">
-					<nav>
-						<ul class="pagination">
-							<li class="disabled"><a href="#">首页</a></li>
-							<li class="disabled"><a href="#">上一页</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">下一页</a></li>
-							<li class="disabled"><a href="#">末页</a></li>
-						</ul>
-					</nav>
-				</div>
+			<div id="cluePage" style="height: 80px; position: relative;top: 60px;">
+
 			</div>
 			
 		</div>

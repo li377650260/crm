@@ -1,5 +1,7 @@
 package com.tonpower.crm.workbench.domain;
 
+import java.util.UUID;
+
 public class ClueActivityRelation {
 	
 	private String id;
