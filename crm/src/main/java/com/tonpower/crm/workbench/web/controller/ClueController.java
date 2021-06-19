@@ -31,7 +31,7 @@ public class ClueController extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        System.out.println("进入市场活动控制器");
+        System.out.println("进入线索控制器");
 
         String path = request.getServletPath();
 
